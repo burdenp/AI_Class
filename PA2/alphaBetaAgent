@@ -1,0 +1,47 @@
+class AlphaBetaAgent(MultiAgentSearchAgent):
+    """
+      Your minimax agent with alpha-beta pruning (question 3)
+    """   
+
+    def getAction(self, gameState):
+        """
+          Returns the minimax action using self.depth and self.evaluationFunction
+        """
+        bestAction = None
+        maxMinValue = None
+        a = -float("inf")
+        b = float("inf")
+        for y in gameState.getLegalActions(0):
+            temp = self.minValue(gameState.generateSuccessor(0,y), a, b, 0, 1)
+            if bestAction is None or  maxMinValue < temp :
+                bestAction = y
+                maxMinValue = temp
+            if maxMinValue > b: return bestAction
+            a = max(a,maxMinValue)
+        return bestAction
+
+
+    def maxValue(self, state, a, b, depth):
+        if state.isWin() or state.isLose() or depth == self.depth:
+            return self.evaluationFunction(state)
+        v = -float("inf")
+        for y in state.getLegalActions(0):
+            v = max(v, self.minValue(state.generateSuccessor(0,y), a, b, depth, 1))
+            if v > b: return v
+            a = max(a,v)
+        return v
+    
+    def minValue(self, state, a, b, depth, agentIndex):
+        if state.isWin() or state.isLose() or depth == self.depth:
+            return self.evaluationFunction(state)
+        v = float("inf")
+        for y in state.getLegalActions(agentIndex):
+            if agentIndex == state.getNumAgents() -1:
+                v = min(v, self.maxValue(state.generateSuccessor(agentIndex,y), a, b, depth+1))
+            else:
+                v = min(v, self.minValue(state.generateSuccessor(agentIndex,y), a, b,depth, agentIndex+1))
+            if v < a: return v
+            b = min(b,v)
+        return v
+        
+        util.raiseNotDefined()
